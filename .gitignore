@@ -1,6 +1,7 @@
 <<<<<<< Updated upstream
 src/sdk/node_modules
 src/sdk/tests/coverage
+<<<<<<< HEAD
 =======
 
 # Created by https://www.gitignore.io/api/osx
@@ -36,3 +37,6 @@ Temporary Items
 
 # End of https://www.gitignore.io/api/osx
 >>>>>>> Stashed changes
+=======
+docs/examples/sdk/node_modules/*
+>>>>>>> develop
