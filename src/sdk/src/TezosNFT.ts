@@ -102,9 +102,9 @@ export class TezosNFT {
      * Transfer(record nftToTransfer = 1n ; destination = ("tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" : address) end)
      * 
      * Michelson:
-     * (Right (Pair "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" 1))
+     * (Right (Right (Pair "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" 1)))
      */
-    const michelsonParameters = `(Right (Pair "${destination}" ${id}))`;
+    const michelsonParameters = `(Right (Right (Pair "${destination}" ${id})))`;
     return await this.forgeOperation(transaction, michelsonParameters, blockHead);
   }
 }

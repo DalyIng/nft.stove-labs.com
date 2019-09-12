@@ -69,10 +69,15 @@ type actionBurn is record [
 nftToBurnId : nftId;
 ]
 
+type actionExtension is record [
+  nftId : nftId;
+]
+
 type action is
 | Mint of actionMint
 | Transfer of actionTransfer
 | Burn of actionBurn
+| Extension of actionExtension
 
 // Mints a new NFT by creating a new entry in the contract.
 // @param nftToMintId - ID of the NFT
@@ -91,6 +96,9 @@ block { skip } with ((nil: list(operation)) , s)
 function burn(const action : actionBurn ; const s : storageType) : (list(operation) * storageType) is
 block { skip } with ((nil: list(operation)) , s)
 
+// This function is reserved for extensions. This is to preserve SDK compatibility (pattern matching of entrypoints).
+function extension(const action : actionExtension ; const s : storageType)
+
 // @remarks In v004 Athens, Michelson does not support multiple entrypoints. This is solved 
 // in Ligo through variants and pattern matching.
 // @param Any of the action types defined above.
@@ -100,6 +108,7 @@ case action of
 | Mint (mt) -> mint (mt, s)
 | Transfer (tx) -> transfer (tx, s)
 | Burn (bn) -> burn (bn, s)
+| Extension (en) -> extension (en, s)
 end
                     </code></pre>
                     <div class="built-by text-center">
@@ -147,10 +156,10 @@ $ tezos-client originate contract nft for alice transferring 0 from alice runnin
                 <div>
                     <pre><code class="language-shell-session"># Compile the LIGO transaction parameter into it's Michelson representation
 $ ligo compile-parameter nft.ligo main 'Transfer(record nftToTransfer = 1n ; destination = ("tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" : address) end)'
-(Right (Pair "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" 1))
+(Right (Right (Pair "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" 1)))
 
 # Invoke the contract by a parametrized transaction
-$ tezos-client transfer 0 from alice to nft --arg '(Right (Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 1))'
+$ tezos-client transfer 0 from alice to nft --arg '(Right (Right (Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 1)))'
                     </code></pre>
                 </div>
 
@@ -158,10 +167,10 @@ $ tezos-client transfer 0 from alice to nft --arg '(Right (Pair \"tz1KqTpEZ7Yob7
                 <div>
                     <pre><code class="language-shell-session"># Compile the LIGO transaction parameter into it's Michelson representation
 $ ligo compile-parameter nft.ligo main 'Mint(record nftToMintId = 2n ; nftToMint = record owner = ("tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" : address); end; end)'
-(Left (Right (Pair "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" 2)))
+(Right (Left (Pair "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx" 2)))
 
 # Invoke the contract by a parametrized transaction
-$ tezos-client transfer 0 from alice to nft --arg '(Left (Right (Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 2)))'
+$ tezos-client transfer 0 from alice to nft --arg '(Right (Left (Pair \"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx\" 2)))'
                     </code></pre>
                 </div>
 
