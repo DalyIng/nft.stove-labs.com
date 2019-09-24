@@ -23,13 +23,18 @@ type actionTransfer is record [
 ]
 
 type actionBurn is record [
-    nftToBurnId : nftId;
+  nftToBurnId : nftId;
+]
+
+type actionExtension is record [
+  nftId : nftId;
 ]
 
 type action is
 | Mint of actionMint
 | Transfer of actionTransfer
 | Burn of actionBurn
+| Extension of actionExtension
 
 
 // Mints a new NFT by creating a new entry in the contract.
@@ -40,11 +45,11 @@ function mint(const action : actionMint ; const s : storageType) : (list(operati
     // check permission
     if source =/= s.contractOwner then fail("You do not have permission to mint assets");
     else skip;
-    // create NFT
+    // create NFT for new ID
     const nfts : nfts = s.nfts;
     nfts[action.nftToMintId] := action.nftToMint;
     s.nfts := nfts;
-  } with ((nil: list(operation)) , s)
+   } with ((nil: list(operation)) , s)
 
 // Transfers the ownership of an NFT by replacing the owner address.
 // @param nftToTransfer - ID of the NFT
@@ -77,6 +82,9 @@ function burn(const action : actionBurn ; const s : storageType) : (list(operati
     s.nfts := nfts;
    } with ((nil: list(operation)) , s)
 
+function extension(const action : actionExtension ; const s : storageType) : (list(operation) * storageType) is
+  block { skip } with ((nil : list(operation)) , s)
+
 // @remarks In v004 Athens, Michelson does not support multiple entrypoints. This is solved 
 // in Ligo through variants and pattern matching.
 // @param Any of the action types defined above.
@@ -86,4 +94,5 @@ function main(const action : action; const s : storageType) : (list(operation) *
  | Mint (mt) -> mint (mt, s)
  | Transfer (tx) -> transfer (tx, s)
  | Burn (bn) -> burn (bn, s)
+ | Extension (en) -> extension (en, s)
 end
